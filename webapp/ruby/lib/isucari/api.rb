@@ -18,6 +18,7 @@ module Isucari
       req = Net::HTTP::Post.new(uri.path)
       req.body = param.to_json
       req['Content-Type'] = 'application/json'
+      req['Host'] = 'payment'
       req['User-Agent'] = @user_agent
 
       http = Net::HTTP.new(uri.host, uri.port)
@@ -38,6 +39,7 @@ module Isucari
       req.body = param.to_json
       req['Content-Type'] = 'application/json'
       req['User-Agent'] = @user_agent
+      req['Host'] = 'shipment'
       req['Authorization'] = ISUCARI_API_TOKEN
 
       http = Net::HTTP.new(uri.host, uri.port)
@@ -58,6 +60,7 @@ module Isucari
       req.body = param.to_json
       req['Content-Type'] = 'application/json'
       req['User-Agent'] = @user_agent
+      req['Host'] = 'shipment'
       req['Authorization'] = ISUCARI_API_TOKEN
 
       http = Net::HTTP.new(uri.host, uri.port)
@@ -78,6 +81,7 @@ module Isucari
       req.body = param.to_json
       req['Content-Type'] = 'application/json'
       req['User-Agent'] = @user_agent
+      req['Host'] = 'shipment'
       req['Authorization'] = ISUCARI_API_TOKEN
 
       http = Net::HTTP.new(uri.host, uri.port)

@@ -40,16 +40,35 @@ module Isucari
 
     BCRYPT_COST = 10
 
-    configure :development do
-      require 'sinatra/reloader'
-      register Sinatra::Reloader
-    end
-
     set :add_charset, ['application/json']
     set :public_folder, File.join(__dir__, '..', '..', 'public')
     set :root, File.join(__dir__, '..', '..')
     set :session_secret, 'tagomoris'
     set :sessions, 'key' => 'isucari_session', 'expire_after' => 3600
+
+    configure :development do
+      require 'sinatra/reloader'
+      register Sinatra::Reloader
+      configure {
+        Dir.mkdir("log") unless File.exist?("log")
+
+        access_log = File.new("#{settings.root}/log/access.log","a+")
+        access_log.sync = true
+        use Rack::CommonLogger, access_log
+
+        error_log = File.new("#{settings.root}/log/error.log","a+")
+        error_log.sync = true
+
+        app_log = File.new("#{settings.root}/log/application.log","a+")
+        app_log.sync = true
+        app_logger = Logger.new(app_log)
+
+        before {
+          env["rack.errors"] = error_log
+          env["rack.logger"] = app_logger
+        }
+      }
+    end
 
     helpers do
       def db
