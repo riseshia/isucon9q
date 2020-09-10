@@ -151,7 +151,7 @@ module Isucari
       end
 
       def body_params
-        @body_params ||= JSON.parse(request.body.tap(&:rewind).read)
+        @body_params ||= Oj.load(request.body.tap(&:rewind).read)
       end
 
       def halt_with_error(status = 500, error = 'unknown')
@@ -1295,7 +1295,7 @@ module Isucari
       { 'error' => 'db error' }.to_json
     end
 
-    error JSON::ParserError do
+    error Oj::ParseError do
       { 'error' => 'json decode error' }.to_json
     end
   end
