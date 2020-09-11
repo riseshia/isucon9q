@@ -9,6 +9,8 @@ gem 'newrelic_rpm'
 gem 'oj'
 
 group :development do
+  gem 'rack-lineprof'
+  gem 'stackprof', git: 'git@github.com:osyoyu/stackprof.git'
   gem 'byebug'
   gem 'sinatra-contrib'
 end
