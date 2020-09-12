@@ -3,8 +3,16 @@ require 'securerandom'
 require 'sinatra/base'
 require 'mysql2'
 require 'mysql2-cs-bind'
+require 'mysql2-query-logger'
 require 'bcrypt'
 require 'isucari/api'
+
+if ENV['sp'] != '1'
+  require 'newrelic_rpm'
+  require 'newrelic_mysql_logger'
+  NewrelicMysqlLogger.enable
+end
+Mysql2QueryLogger.enable
 
 module Isucari
   class Web < Sinatra::Base
@@ -58,6 +66,12 @@ module Isucari
 
         error_log = File.new("#{settings.root}/log/error.log","a+")
         error_log.sync = true
+
+        curl_log = File.new("#{settings.root}/log/curl.log","a+")
+        curl_log.sync = true
+        Recurl.configure do |config|
+          config.logger = Logger.new(curl_log)
+        end
 
         app_log = File.new("#{settings.root}/log/application.log","a+")
         app_log.sync = true

@@ -7,10 +7,13 @@ gem 'mysql2-cs-bind'
 gem 'bcrypt'
 gem 'newrelic_rpm'
 gem 'oj'
+gem 'concurrent-ruby-ext'
+gem 'recurl'
+gem 'mysql2-query-logger', git: 'git@github.com:hokaccha/mysql2-query-logger.git'
+gem 'rack-lineprof'
+gem 'stackprof', git: 'git@github.com:osyoyu/stackprof.git'
 
 group :development do
-  gem 'rack-lineprof'
-  gem 'stackprof', git: 'git@github.com:osyoyu/stackprof.git'
   gem 'byebug'
   gem 'sinatra-contrib'
 end
