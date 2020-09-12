@@ -16,6 +16,52 @@ Mysql2QueryLogger.enable
 
 module Isucari
   class Web < Sinatra::Base
+    CATETORIES = {
+      1 => { 'id' => 1, 'parent_id' => 0, 'category_name' => "ソファー" },
+      2 => { 'id' => 2, 'parent_id' => 1, 'category_name' => "一人掛けソファー" },
+      3 => { 'id' => 3, 'parent_id' => 1, 'category_name' => "二人掛けソファー" },
+      4 => { 'id' => 4, 'parent_id' => 1, 'category_name' => "コーナーソファー" },
+      5 => { 'id' => 5, 'parent_id' => 1, 'category_name' => "二段ソファー" },
+      6 => { 'id' => 6, 'parent_id' => 1, 'category_name' => "ソファーベッド" },
+      10 => { 'id' => 10, 'parent_id' =>  0, 'category_name' => "家庭用チェア" },
+      11 => { 'id' => 11, 'parent_id' => 10, 'category_name' => "スツール" },
+      12 => { 'id' => 12, 'parent_id' => 10, 'category_name' => "クッションスツール" },
+      13 => { 'id' => 13, 'parent_id' => 10, 'category_name' => "ダイニングチェア" },
+      14 => { 'id' => 14, 'parent_id' => 10, 'category_name' => "リビングチェア" },
+      15 => { 'id' => 15, 'parent_id' => 10, 'category_name' => "カウンターチェア" },
+      20 => { 'id' => 20, 'parent_id' =>  0, 'category_name' => "キッズチェア" },
+      21 => { 'id' => 21, 'parent_id' => 20, 'category_name' => "学習チェア" },
+      22 => { 'id' => 22, 'parent_id' => 20, 'category_name' => "ベビーソファ" },
+      23 => { 'id' => 23, 'parent_id' => 20, 'category_name' => "キッズハイチェア" },
+      24 => { 'id' => 24, 'parent_id' => 20, 'category_name' => "テーブルチェア" },
+      30 => { 'id' => 30, 'parent_id' =>  0, 'category_name' => "オフィスチェア" },
+      31 => { 'id' => 31, 'parent_id' => 30, 'category_name' => "デスクチェア" },
+      32 => { 'id' => 32, 'parent_id' => 30, 'category_name' => "ビジネスチェア" },
+      33 => { 'id' => 33, 'parent_id' => 30, 'category_name' => "回転チェア" },
+      34 => { 'id' => 34, 'parent_id' => 30, 'category_name' => "リクライニングチェア" },
+      35 => { 'id' => 35, 'parent_id' => 30, 'category_name' => "投擲用椅子" },
+      40 => { 'id' => 40, 'parent_id' => 0, 'category_name' => "折りたたみ椅子" },
+      41 => { 'id' => 41, 'parent_id' => 40, 'category_name' => "パイプ椅子" },
+      42 => { 'id' => 42, 'parent_id' => 40, 'category_name' => "木製折りたたみ椅子" },
+      43 => { 'id' => 43, 'parent_id' => 40, 'category_name' => "キッチンチェア" },
+      44 => { 'id' => 44, 'parent_id' => 40, 'category_name' => "アウトドアチェア" },
+      45 => { 'id' => 45, 'parent_id' => 40, 'category_name' => "作業椅子" },
+      50 => { 'id' => 50, 'parent_id' =>  0, 'category_name' => "ベンチ" },
+      51 => { 'id' => 51, 'parent_id' => 50, 'category_name' => "一人掛けベンチ" },
+      52 => { 'id' => 52, 'parent_id' => 50, 'category_name' => "二人掛けベンチ" },
+      53 => { 'id' => 53, 'parent_id' => 50, 'category_name' => "アウトドア用ベンチ" },
+      54 => { 'id' => 54, 'parent_id' => 50, 'category_name' => "収納付きベンチ" },
+      55 => { 'id' => 55, 'parent_id' => 50, 'category_name' => "背もたれ付きベンチ" },
+      56 => { 'id' => 56, 'parent_id' => 50, 'category_name' => "ベンチマーク" },
+      60 => { 'id' => 60, 'parent_id' =>  0, 'category_name' => "座椅子" },
+      61 => { 'id' => 61, 'parent_id' => 60, 'category_name' => "和風座椅子" },
+      62 => { 'id' => 62, 'parent_id' => 60, 'category_name' => "高座椅子" },
+      63 => { 'id' => 63, 'parent_id' => 60, 'category_name' => "ゲーミング座椅子" },
+      64 => { 'id' => 64, 'parent_id' => 60, 'category_name' => "ロッキングチェア" },
+      65 => { 'id' => 65, 'parent_id' => 60, 'category_name' => "座布団" },
+      66 => { 'id' => 66, 'parent_id' => 60, 'category_name' => "空気椅子" },
+    }
+
     DEFAULT_PAYMENT_SERVICE_URL = 'http://localhost:5555'
     DEFAULT_SHIPMENT_SERVICE_URL = 'http://localhost:7000'
 
@@ -111,6 +157,17 @@ module Isucari
         db.xquery('SELECT * FROM `users` WHERE `id` = ?', user_id).first
       end
 
+      def get_users_simple_by_ids(user_ids)
+        users = db.xquery('SELECT * FROM `users` WHERE `id` IN (?)', user_ids)
+        users.map do |user|
+          {
+            'id' => user['id'],
+            'account_name' => user['account_name'],
+            'num_sell_items' => user['num_sell_items']
+          }
+        end.each_with_object({}) { |user, obj| obj[user['id']] = user }
+      end
+
       def get_user_simple_by_id(user_id)
         user = db.xquery('SELECT * FROM `users` WHERE `id` = ?', user_id).first
 
@@ -124,8 +181,7 @@ module Isucari
       end
 
       def get_category_by_id(category_id)
-        category = db.xquery('SELECT * FROM `categories` WHERE `id` = ?', category_id).first
-
+        category = CATETORIES[category_id.to_i]
         return if category.nil?
 
         parent_category_name = if category['parent_id'] != 0
@@ -144,6 +200,10 @@ module Isucari
         }
       end
 
+      def name_config_cache
+        Thread.current[:name_config_cache] ||= {}
+      end
+
       def get_config_by_name(name)
         config = db.xquery('SELECT * FROM `configs` WHERE `name` = ?', name).first
 
@@ -153,11 +213,11 @@ module Isucari
       end
 
       def get_payment_service_url
-        get_config_by_name('payment_service_url') || DEFAULT_PAYMENT_SERVICE_URL
+        name_config_cache['payment_service_url'] ||= (get_config_by_name('payment_service_url') || DEFAULT_PAYMENT_SERVICE_URL)
       end
 
       def get_shipment_service_url
-        get_config_by_name('shipment_service_url') || DEFAULT_SHIPMENT_SERVICE_URL
+        name_config_cache['shipment_service_url'] ||= (get_config_by_name('shipment_service_url') || DEFAULT_SHIPMENT_SERVICE_URL)
       end
 
       def get_image_url(image_name)
@@ -255,7 +315,8 @@ module Isucari
       root_category = get_category_by_id(root_category_id)
       halt_with_error 404, 'category not found' if root_category.nil?
 
-      category_ids = db.xquery('SELECT id FROM `categories` WHERE parent_id = ?', root_category['id']).map { |row| row['id'] }
+      root_id = root_category['id'].to_i
+      category_ids = CATETORIES.values.select { |row| row['parent_id'] == root_id }.map { |row| row['id'] }
 
       item_id = params['item_id'].to_i
       created_at = params['created_at'].to_i
@@ -266,8 +327,9 @@ module Isucari
         db.xquery("SELECT * FROM `items` WHERE `status` IN (?,?) AND category_id IN (?) ORDER BY `created_at` DESC, `id` DESC LIMIT #{ITEMS_PER_PAGE + 1}", ITEM_STATUS_ON_SALE, ITEM_STATUS_SOLD_OUT, category_ids)
       end
 
+      users_by_id = get_users_simple_by_ids(items.map { |i| i['seller_id'] })
       item_simples = items.map do |item|
-        seller = get_user_simple_by_id(item['seller_id'])
+        seller = users_by_id[item['seller_id']]
         halt_with_error 404, 'seller not found' if seller.nil?
 
         category = get_category_by_id(item['category_id'])
@@ -322,8 +384,18 @@ module Isucari
       else
         # 1st page
         begin
-          db.xquery("SELECT * FROM `items` WHERE (`seller_id` = ? OR `buyer_id` = ?) AND `status` IN (?, ?, ?, ?, ?) ORDER BY `created_at` DESC, `id` DESC LIMIT #{TRANSACTIONS_PER_PAGE + 1}", user['id'], user['id'], ITEM_STATUS_ON_SALE, ITEM_STATUS_TRADING, ITEM_STATUS_SOLD_OUT, ITEM_STATUS_CANCEL, ITEM_STATUS_STOP)
-        rescue
+          # db.xquery("SELECT * FROM `items` WHERE (`seller_id` = ? OR `buyer_id` = ?) AND `status` IN (?, ?, ?, ?, ?) ORDER BY `created_at` DESC, `id` DESC LIMIT #{TRANSACTIONS_PER_PAGE + 1}", user['id'], user['id'], ITEM_STATUS_ON_SALE, ITEM_STATUS_TRADING, ITEM_STATUS_SOLD_OUT, ITEM_STATUS_CANCEL, ITEM_STATUS_STOP)
+          sql = <<~EOQ
+            SELECT * from (
+              SELECT * FROM `items`
+              WHERE `seller_id` = ? AND `status` IN (?, ?, ?, ?, ?)
+              UNION ALL
+              SELECT * FROM `items`
+              WHERE `buyer_id` = ? AND `status` IN (?, ?, ?, ?, ?)
+            ) as t ORDER BY `created_at` DESC, `id` DESC LIMIT #{TRANSACTIONS_PER_PAGE + 1}
+          EOQ
+          db.xquery(sql, user['id'], ITEM_STATUS_ON_SALE, ITEM_STATUS_TRADING, ITEM_STATUS_SOLD_OUT, ITEM_STATUS_CANCEL, ITEM_STATUS_STOP, user['id'], ITEM_STATUS_ON_SALE, ITEM_STATUS_TRADING, ITEM_STATUS_SOLD_OUT, ITEM_STATUS_CANCEL, ITEM_STATUS_STOP)
+        rescue => e
           db.query('ROLLBACK')
           halt_with_error 500, 'db error'
         end
@@ -380,21 +452,29 @@ module Isucari
             halt_with_error 404, 'shipping not found'
           end
 
-          ssr = begin
+          future = Concurrent::Future.execute do
             api_client.shipment_status(get_shipment_service_url, 'reserve_id' => shipping['reserve_id'])
-          rescue
-            db.query('ROLLBACK')
-            halt_with_error 500, 'failed to request to shipment service'
           end
 
           item_detail['transaction_evidence_id'] = transaction_evidence['id']
           item_detail['transaction_evidence_status'] = transaction_evidence['status']
-          item_detail['shipping_status'] = ssr['status']
+          item_detail['shipping_status_future'] = future
         end
 
         item_detail
       end
 
+      item_details.each do |item_detail|
+        if item_detail.key?('shipping_status_future')
+          ssr = item_detail['shipping_status_future'].value
+          if ssr.nil?
+            db.query('ROLLBACK')
+            halt_with_error 500, 'failed to request to shipment service'
+          end
+          item_detail['shipping_status'] = ssr['status']
+          item_detail.delete('shipping_status_future')
+        end
+      end
       db.query('COMMIT')
 
       has_next = false
@@ -1171,7 +1251,7 @@ module Isucari
       response['user'] = user unless user.nil?
       response['payment_service_url'] = get_payment_service_url
 
-      categories = db.xquery('SELECT * FROM `categories`').to_a
+      categories = CATETORIES.values
       response['categories'] = categories
 
       response.to_json
